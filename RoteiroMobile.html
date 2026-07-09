@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Meu Plano Mobile | React Native</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+            background-color: #0f172a; /* slate-900 */
+            color: #f8fafc; /* slate-50 */
+        }
+        
+        /* Ocultar barra de rolagem mas manter funcionalidade */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+        
+        .phase-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .phase-content.open {
+            max-height: 2000px; /* Valor alto o suficiente para conter o conteúdo */
+            transition: max-height 0.5s ease-in;
+        }
+
+        .checkbox-custom {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border: 2px solid #475569;
+            border-radius: 6px;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .checkbox-custom:checked {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        .checkbox-custom:checked::after {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 3px;
+            width: 6px;
+            height: 12px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .youtube-btn {
+            background-color: #ef4444; /* red-500 */
+            color: white;
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s;
+        }
+        
+        .youtube-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body class="antialiased pb-24">
+
+    <!-- Header Fixo -->
+    <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 p-4">
+        <div class="flex items-center justify-between mb-3">
+            <h1 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
+                Mobile Master Plan
+            </h1>
+            <div class="text-sm font-medium text-slate-400 bg-slate-800 px-3 py-1 rounded-full flex items-center gap-2">
+                <i data-lucide="award" class="w-4 h-4 text-yellow-500"></i>
+                <span id="progress-text">0%</span>
+            </div>
+        </div>
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-800 rounded-full h-2.5">
+            <div id="progress-bar" class="bg-gradient-to-r from-blue-500 to-indigo-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+    </header>
+
+    <!-- Main Content (Renderizado via JS) -->
+    <main id="app" class="p-4 space-y-4 max-w-2xl mx-auto">
+        <!-- O conteúdo será injetado aqui -->
+    </main>
+
+    <script>
+        // Dados do Plano de Estudos
+        const studyPlan = [
+            {
+                id: "fase1",
+                title: "Fase 1 – Fundamentos do React Native",
+                duration: "2 semanas",
+                objective: "Criar aplicativos simples e entender a estrutura do React Native.",
+                channels: ["Sujeito Programador", "Matheus Battisti", "Rocketseat", "Mateus Silva", "Cod3r"],
+                projects: ["Lista de tarefas", "Agenda", "Calculadora de IMC"],
+                topics: [
+                    { id: "1.1", name: "O que é React Native", search: "O que é React Native" },
+                    { id: "1.2", name: "Expo", search: "React Native Expo tutorial iniciante" },
+                    { id: "1.3", name: "Estrutura de um projeto", search: "React Native estrutura de pastas projeto" },
+                    { id: "1.4", name: "Componentes", search: "React Native Componentes tutorial" },
+                    { id: "1.5", name: "JSX", search: "React Native JSX como funciona" },
+                    { id: "1.6", name: "Props", search: "React Native Props propriedades" },
+                    { id: "1.7", name: "State", search: "React Native State estado" },
+                    { id: "1.8", name: "Hooks", search: "React Native Hooks useState useEffect" },
+                    { id: "1.9", name: "Flexbox", search: "React Native Flexbox layout" },
+                    { id: "1.10", name: "Estilos", search: "React Native StyleSheet estilos" },
+                    { id: "1.11", name: "ScrollView", search: "React Native ScrollView" },
+                    { id: "1.12", name: "FlatList", search: "React Native FlatList listas" },
+                    { id: "1.13", name: "Imagens", search: "React Native Imagens Image" },
+                    { id: "1.14", name: "Ícones", search: "React Native Vector Icons" }
+                ]
+            },
+            {
+                id: "fase2",
+                title: "Fase 2 – Navegação e Componentes",
+                duration: "1 semana",
+                projects: ["Sistema com Login, Dashboard, Perfil, Configurações"],
+                topics: [
+                    { id: "2.1", name: "React Navigation", search: "React Navigation v6 tutorial pt br" },
+                    { id: "2.2", name: "Stack Navigation", search: "React Navigation Stack" },
+                    { id: "2.3", name: "Bottom Tabs", search: "React Navigation Bottom Tabs" },
+                    { id: "2.4", name: "Drawer", search: "React Navigation Drawer menu lateral" },
+                    { id: "2.5", name: "Deep Linking", search: "React Native Deep Linking" },
+                    { id: "2.6", name: "Temas", search: "React Native Temas Dark Mode" }
+                ]
+            },
+            {
+                id: "fase3",
+                title: "Fase 3 – Comunicação com APIs",
+                duration: "2 semanas",
+                projects: ["App consumindo sua API Spring Boot ou Supabase"],
+                topics: [
+                    { id: "3.1", name: "Axios", search: "React Native Axios consumo api" },
+                    { id: "3.2", name: "Fetch", search: "React Native Fetch API" },
+                    { id: "3.3", name: "REST API", search: "Entendendo REST API React Native" },
+                    { id: "3.4", name: "JWT", search: "React Native autenticação JWT" },
+                    { id: "3.5", name: "Login", search: "React Native tela de login API" },
+                    { id: "3.6", name: "Refresh Token", search: "React Native Refresh Token Axios" },
+                    { id: "3.7", name: "Tratamento de erros", search: "React Native tratamento de erros try catch" }
+                ]
+            },
+            {
+                id: "fase4",
+                title: "Fase 4 – Estado da aplicação",
+                duration: "1 semana",
+                projects: ["Carrinho de compras"],
+                topics: [
+                    { id: "4.1", name: "Context API", search: "React Native Context API estado global" },
+                    { id: "4.2", name: "Zustand", search: "React Native Zustand tutorial pt br" },
+                    { id: "4.3", name: "Quando usar Redux", search: "React Native Redux vale a pena" },
+                    { id: "4.4", name: "Persistência de estado", search: "React Native persistência estado AsyncStorage" }
+                ]
+            },
+            {
+                id: "fase5",
+                title: "Fase 5 – Formulários",
+                duration: "1 semana",
+                projects: ["Cadastro de funcionário"],
+                topics: [
+                    { id: "5.1", name: "React Hook Form", search: "React Native React Hook Form" },
+                    { id: "5.2", name: "Zod", search: "React Native validação Zod" },
+                    { id: "5.3", name: "Máscaras", search: "React Native máscaras input CPF" },
+                    { id: "5.4", name: "Validação", search: "React Native validação de formulários" }
+                ]
+            },
+            {
+                id: "fase6",
+                title: "Fase 6 – Recursos do celular",
+                duration: "2 semanas",
+                projects: ["App de RH"],
+                topics: [
+                    { id: "6.1", name: "Câmera", search: "Expo Camera React Native" },
+                    { id: "6.2", name: "Galeria", search: "Expo Image Picker React Native galeria" },
+                    { id: "6.3", name: "GPS", search: "Expo Location GPS React Native" },
+                    { id: "6.4", name: "Biometria", search: "Expo Local Authentication Biometria React Native" },
+                    { id: "6.5", name: "Push Notification", search: "Expo Push Notifications React Native" },
+                    { id: "6.6", name: "Permissões", search: "React Native Permissões câmera local" },
+                    { id: "6.7", name: "Compartilhamento", search: "React Native Share compartilhar" },
+                    { id: "6.8", name: "Arquivos", search: "Expo File System salvar arquivos React Native" }
+                ]
+            },
+            {
+                id: "fase7",
+                title: "Fase 7 – Banco de dados local",
+                duration: "1 semana",
+                projects: ["Aplicativo offline"],
+                topics: [
+                    { id: "7.1", name: "AsyncStorage", search: "React Native AsyncStorage" },
+                    { id: "7.2", name: "SQLite", search: "Expo SQLite React Native banco local" },
+                    { id: "7.3", name: "MMKV", search: "React Native MMKV armazenamento rápido" }
+                ]
+            },
+            {
+                id: "fase8",
+                title: "Fase 8 – Publicação",
+                duration: "1 semana",
+                topics: [
+                    { id: "8.1", name: "Build Android", search: "EAS Build Android APK AAB Expo" },
+                    { id: "8.2", name: "Build iOS", search: "EAS Build iOS TestFlight Expo" },
+                    { id: "8.3", name: "Play Store", search: "Como publicar app na Google Play Store" },
+                    { id: "8.4", name: "App Store", search: "Como publicar app na Apple App Store" },
+                    { id: "8.5", name: "Assinatura", search: "Keystore assinatura app Android" },
+                    { id: "8.6", name: "Ícones", search: "Expo icons splash screen" },
+                    { id: "8.7", name: "Splash Screen", search: "React Native Splash Screen Expo" }
+                ]
+            },
+            {
+                id: "fase9",
+                title: "Fase 9 – Android (Nativo)",
+                desc: "IDE: Android Studio | Linguagem: Kotlin",
+                channels: ["Douglas Motta", "DevSpace", "Philipp Lackner", "Coding with Mitch"],
+                projects: ["Aplicativo de notas nativo"],
+                topics: [
+                    { id: "9.1", name: "Estrutura Android", search: "Android Studio Kotlin estrutura de projeto" },
+                    { id: "9.2", name: "Activities", search: "Android Kotlin Activities ciclo de vida" },
+                    { id: "9.3", name: "Fragments", search: "Android Kotlin Fragments tutorial" },
+                    { id: "9.4", name: "Intents", search: "Android Kotlin Intents navegação" },
+                    { id: "9.5", name: "Services", search: "Android Kotlin Services background" },
+                    { id: "9.6", name: "Broadcast Receiver", search: "Android Kotlin Broadcast Receiver" },
+                    { id: "9.7", name: "Gradle", search: "O que é Gradle Android Studio" },
+                    { id: "9.8", name: "Manifest", search: "Android Manifest explicacao" },
+                    { id: "9.9", name: "Permissões", search: "Android Kotlin solicitar permissões" },
+                    { id: "9.10", name: "Material Design", search: "Material Design Android Kotlin" },
+                    { id: "9.11", name: "Jetpack Compose", search: "Jetpack Compose introdução Kotlin" }
+                ]
+            },
+            {
+                id: "fase10",
+                title: "Fase 10 – iOS (Nativo)",
+                desc: "IDE: Xcode | Linguagem: Swift",
+                channels: ["Sean Allen", "CodeWithChris", "Swiftful Thinking"],
+                projects: ["Aplicativo de agenda"],
+                topics: [
+                    { id: "10.1", name: "Swift básico", search: "Swift tutorial iniciantes" },
+                    { id: "10.2", name: "UIKit", search: "iOS Swift UIKit tutorial" },
+                    { id: "10.3", name: "SwiftUI", search: "SwiftUI tutorial iniciantes" },
+                    { id: "10.4", name: "Navigation", search: "SwiftUI NavigationStack" },
+                    { id: "10.5", name: "Storyboard", search: "Xcode Storyboard conceitos" },
+                    { id: "10.6", name: "Assets", search: "Xcode Assets imagens ícones" },
+                    { id: "10.7", name: "Permissões", search: "iOS Swift solicitar permissões Info.plist" }
+                ]
+            },
+            {
+                id: "fase11",
+                title: "Fase 11 – Arquitetura",
+                desc: "Separa quem faz telas de quem cria aplicações robustas.",
+                topics: [
+                    { id: "11.1", name: "Clean Architecture", search: "Clean Architecture React Native" },
+                    { id: "11.2", name: "SOLID", search: "Princípios SOLID exemplos práticos" },
+                    { id: "11.3", name: "MVVM", search: "Padrão MVVM mobile" },
+                    { id: "11.4", name: "Repository Pattern", search: "Repository Pattern explicado" },
+                    { id: "11.5", name: "Dependency Injection", search: "Injeção de dependência mobile" },
+                    { id: "11.6", name: "Feature First", search: "Arquitetura Feature First React Native" },
+                    { id: "11.7", name: "Modularização", search: "Modularização em aplicativos mobile" }
+                ]
+            },
+            {
+                id: "fase12",
+                title: "Fase 12 – Testes",
+                topics: [
+                    { id: "12.1", name: "Jest", search: "Jest tutorial React Native" },
+                    { id: "12.2", name: "Testing Library", search: "React Native Testing Library tutorial" },
+                    { id: "12.3", name: "Testes unitários", search: "Como fazer testes unitários React Native" },
+                    { id: "12.4", name: "Testes de integração", search: "Testes de integração mobile" }
+                ]
+            },
+            {
+                id: "fase13",
+                title: "Fase 13 – CI/CD",
+                topics: [
+                    { id: "13.1", name: "GitHub Actions", search: "GitHub Actions CI CD React Native" },
+                    { id: "13.2", name: "EAS Build", search: "Expo EAS Build automatizado" },
+                    { id: "13.3", name: "Fastlane", search: "Fastlane tutorial mobile deploy" },
+                    { id: "13.4", name: "Firebase App Dist.", search: "Firebase App Distribution tutorial" }
+                ]
+            },
+            {
+                id: "projeto_final",
+                title: "🏆 Projeto Final (Portfólio)",
+                desc: "Sistema de RH Mobile com funcionalidades reais (O diferencial).",
+                projects: ["Login", "Dashboard", "Holerite", "Solicitação de férias", "Banco de horas", "Escala", "Perfil", "Assinatura digital", "Notificações push", "Funcionamento offline", "Biometria", "Dark Mode"],
+                topics: [
+                    { id: "pf.1", name: "Planejamento e UI/UX", search: "Como planejar um aplicativo do zero" },
+                    { id: "pf.2", name: "Configuração da API mock/real", search: "Supabase tutorial React Native" },
+                    { id: "pf.3", name: "Desenvolvimento das Funcionalidades", search: "Construindo app de RH" },
+                    { id: "pf.4", name: "Publicação nas lojas", search: "Publicando app na Play Store e App Store" }
+                ]
+            }
+        ];
+
+        // Estado do aplicativo
+        let completedTopics = JSON.parse(localStorage.getItem('mobileStudyPlanProgress')) || [];
+        let totalTopics = 0;
+
+        // Calcular total de tópicos
+        studyPlan.forEach(phase => {
+            totalTopics += phase.topics.length;
+        });
+
+        // Função para alternar o estado do Accordion (abrir/fechar Fase)
+        function togglePhase(phaseId) {
+            const content = document.getElementById(`content-${phaseId}`);
+            const icon = document.getElementById(`icon-${phaseId}`);
+            
+            if (content.classList.contains('open')) {
+                content.classList.remove('open');
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.add('open');
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        // Função para marcar/desmarcar um tópico
+        function toggleTopic(topicId) {
+            if (completedTopics.includes(topicId)) {
+                completedTopics = completedTopics.filter(id => id !== topicId);
+            } else {
+                completedTopics.push(topicId);
+            }
+            localStorage.setItem('mobileStudyPlanProgress', JSON.stringify(completedTopics));
+            updateProgress();
+        }
+
+        // Atualizar barra de progresso
+        function updateProgress() {
+            const percentage = Math.round((completedTopics.length / totalTopics) * 100);
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+            document.getElementById('progress-text').innerText = `${percentage}%`;
+        }
+
+        // Gerar link de busca no YouTube para o tópico
+        function getYoutubeUrl(query) {
+            return `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+        }
+
+        // Renderizar a Interface
+        function renderApp() {
+            const app = document.getElementById('app');
+            let html = '';
+
+            studyPlan.forEach((phase, index) => {
+                const isCompleted = phase.topics.every(t => completedTopics.includes(t.id));
+                const phaseBg = isCompleted ? 'bg-slate-800/80 border-green-500/30' : 'bg-slate-800 border-slate-700';
+                const titleColor = isCompleted ? 'text-green-400' : 'text-slate-100';
+
+                html += `
+                    <div class="rounded-2xl border ${phaseBg} overflow-hidden shadow-lg transition-colors">
+                        <!-- Cabeçalho da Fase -->
+                        <div class="p-4 flex items-center justify-between cursor-pointer active:bg-slate-700/50" onclick="togglePhase('${phase.id}')">
+                            <div class="flex-1 pr-4">
+                                <h2 class="text-lg font-semibold ${titleColor} mb-1">${phase.title}</h2>
+                                ${phase.duration ? `<p class="text-xs text-blue-400 font-medium"><i data-lucide="clock" class="w-3 h-3 inline pb-0.5"></i> ${phase.duration}</p>` : ''}
+                                ${phase.desc ? `<p class="text-xs text-slate-400 mt-1">${phase.desc}</p>` : ''}
+                            </div>
+                            <div class="bg-slate-700 p-2 rounded-full flex-shrink-0 transition-transform duration-300" id="icon-${phase.id}">
+                                <i data-lucide="chevron-down" class="w-5 h-5 text-slate-300"></i>
+                            </div>
+                        </div>
+
+                        <!-- Conteúdo da Fase (Tópicos) -->
+                        <div id="content-${phase.id}" class="phase-content bg-slate-900/50 border-t border-slate-800/50">
+                            <div class="p-4 space-y-4">
+                                
+                                ${phase.objective ? `
+                                    <div class="bg-indigo-900/30 border border-indigo-500/20 rounded-xl p-3">
+                                        <p class="text-sm text-indigo-200"><strong>Objetivo:</strong> ${phase.objective}</p>
+                                    </div>
+                                ` : ''}
+
+                                ${phase.channels ? `
+                                    <div>
+                                        <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                            <i data-lucide="youtube" class="w-3 h-3"></i> Canais Recomendados
+                                        </h3>
+                                        <div class="flex flex-wrap gap-2">
+                                            ${phase.channels.map(ch => `<span class="px-2 py-1 bg-red-900/20 text-red-400 border border-red-500/20 rounded-md text-xs">${ch}</span>`).join('')}
+                                        </div>
+                                    </div>
+                                ` : ''}
+
+                                <div>
+                                    <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                        <i data-lucide="book-open" class="w-3 h-3"></i> Tópicos de Estudo
+                                    </h3>
+                                    <ul class="space-y-3">
+                                        ${phase.topics.map(topic => `
+                                            <li class="flex items-center gap-3 bg-slate-800/50 p-3 rounded-xl border border-slate-700/50">
+                                                <input type="checkbox" class="checkbox-custom" 
+                                                    ${completedTopics.includes(topic.id) ? 'checked' : ''} 
+                                                    onchange="toggleTopic('${topic.id}')"
+                                                    id="check-${topic.id}"
+                                                >
+                                                <label for="check-${topic.id}" class="flex-1 text-sm font-medium ${completedTopics.includes(topic.id) ? 'text-slate-500 line-through' : 'text-slate-200'}">
+                                                    ${topic.name}
+                                                </label>
+                                                <a href="${getYoutubeUrl(topic.search)}" target="_blank" rel="noopener noreferrer" 
+                                                   class="youtube-btn" title="Buscar Aula no YouTube">
+                                                    <i data-lucide="play" class="w-4 h-4"></i>
+                                                </a>
+                                            </li>
+                                        `).join('')}
+                                    </ul>
+                                </div>
+
+                                ${phase.projects ? `
+                                    <div class="mt-4 bg-emerald-900/20 border border-emerald-500/20 rounded-xl p-3">
+                                        <h3 class="text-xs font-semibold text-emerald-500 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                            <i data-lucide="code" class="w-3 h-3"></i> Projetos Práticos
+                                        </h3>
+                                        <ul class="list-disc list-inside text-sm text-emerald-100/80 space-y-1 ml-1">
+                                            ${phase.projects.map(p => `<li>${p}</li>`).join('')}
+                                        </ul>
+                                    </div>
+                                ` : ''}
+
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            app.innerHTML = html;
+            lucide.createIcons();
+            
+            // Abrir a primeira fase por padrão
+            if(studyPlan.length > 0) {
+                setTimeout(() => togglePhase(studyPlan[0].id), 100);
+            }
+        }
+
+        // Inicializar o App
+        document.addEventListener('DOMContentLoaded', () => {
+            renderApp();
+            updateProgress();
+        });
+
+    </script>
+</body>
+</html>
